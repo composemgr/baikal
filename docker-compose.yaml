@@ -1,0 +1,27 @@
+# nginx proxy address - http://172.17.0.1:8092
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "1"
+
+services:
+  baikal:
+    image: ckulka/baikal:latest
+    container_name: baikal-app
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - baikal
+    ports:
+      - "8092:80"
+    environment:
+      TZ: ${TZ:-America/New_York}
+    volumes:
+      - ./rootfs/config/baikal:/config
+      - ./rootfs/data/baikal:/data
+
+networks:
+  baikal:
+    external: false
