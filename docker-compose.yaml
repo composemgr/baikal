@@ -19,8 +19,8 @@ services:
     environment:
       TZ: ${TZ:-America/New_York}
     volumes:
-      - ./rootfs/config/baikal:/config
-      - ./rootfs/data/baikal:/data
+      - ./volumes/config/baikal:/config
+      - ./volumes/data/baikal:/data
 
 networks:
   baikal:
