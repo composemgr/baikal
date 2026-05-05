@@ -45,8 +45,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/config/baikal` - Data storage
-- `./rootfs/data/baikal` - Data storage
+- `./volumes/config/baikal` - Data storage
+- `./volumes/data/baikal` - Data storage
 
 ## 🔍 Logging
 
