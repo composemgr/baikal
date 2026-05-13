@@ -1,5 +1,6 @@
 # nginx proxy address - http://172.17.0.1:8092
 
+name: baikal
 x-logging: &default-logging
   driver: json-file
   options:
@@ -9,18 +10,20 @@ x-logging: &default-logging
 services:
   baikal:
     image: ckulka/baikal:latest
+    pull_policy: always
     container_name: baikal-app
-    restart: unless-stopped
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
     logging: *default-logging
     networks:
       - baikal
     ports:
-      - "8092:80"
+      - "172.17.0.1:8092:80"
     environment:
       TZ: ${TZ:-America/New_York}
     volumes:
-      - ./volumes/config/baikal:/config
-      - ./volumes/data/baikal:/data
+      - ./volumes/config/baikal:/var/www/baikal/config
+      - ./volumes/data/baikal:/var/www/baikal/Specific
 
 networks:
   baikal:
