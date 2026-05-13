@@ -15,12 +15,32 @@ services:
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
     logging: *default-logging
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://baikal-app:80'
+      - 'cloudflare.hostname=baikal.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.baikal-app.entrypoints=http'
+      - 'traefik.http.routers.baikal-app-secure.tls=true'
+      - 'traefik.http.routers.baikal-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.baikal-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.baikal-app.middlewares=baikal-app-https-redirect'
+      - 'traefik.http.routers.baikal-app-secure.entrypoints=https'
+      - 'traefik.http.routers.baikal-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.baikal-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.baikal-app-secure.service=baikal-app'
+      - 'traefik.http.services.baikal-app.loadbalancer.server.port=80'
     networks:
       - baikal
+      - proxy
+      - cloudflare
     ports:
       - "172.17.0.1:8092:80"
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: baikal-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     volumes:
       - ./volumes/config/baikal:/var/www/baikal/config
       - ./volumes/data/baikal:/var/www/baikal/Specific
@@ -28,3 +48,7 @@ services:
 networks:
   baikal:
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
