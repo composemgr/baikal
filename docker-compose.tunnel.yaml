@@ -1,0 +1,36 @@
+name: baikal
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  baikal:
+    image: ckulka/baikal:latest
+    container_name: baikal-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: baikal-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/config/baikal:/var/www/baikal/config'
+      - './volumes/data/baikal:/var/www/baikal/Specific'
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://baikal-app:80'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - baikal
+      - cloudflare
+
+networks:
+  baikal:
+    name: baikal
+    external: false
+  cloudflare:
+    external: true
